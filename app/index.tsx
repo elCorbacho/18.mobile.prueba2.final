@@ -26,6 +26,9 @@ export default function HomeScreen() {
   const { lista, eliminarTarea } = useContext<TaskContextType>(TaskContext);
   const { logout, userEmail } = useContext(AuthContext);
 
+  // Filtrar solo las tareas del usuario logueado
+  const misTareas = lista.filter(tarea => tarea.userEmail === userEmail);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaAEliminar, setTareaAEliminar] = useState<string | null>(null);
 
@@ -45,11 +48,12 @@ export default function HomeScreen() {
       {/* Titulo */}
       <Text style={styles.titulo}>Mis Tareas</Text>
 
-      {/* Email y boton cerrar sesion en la misma fila */}
+      {/* Email y Cerrar sesion en la misma fila */}
       <View style={styles.headerRow}>
         <View style={styles.emailContainer}>
           <Text style={styles.emailText}>{userEmail}</Text>
         </View>
+
         <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
           <Text style={styles.logoutText}>Cerrar sesion</Text>
         </TouchableOpacity>
@@ -67,9 +71,9 @@ export default function HomeScreen() {
         <Ionicons name="add" size={32} color="white" />
       </TouchableOpacity>
 
-      {/* Lista de tareas */}
+      {/* Lista de tareas SOLO DEL USUARIO LOGUEADO */}
       <FlatList
-        data={lista}
+        data={misTareas}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <Animated.View
@@ -181,8 +185,8 @@ const styles = StyleSheet.create({
   },
 
   logoutBtn: {
-    paddingVertical: 6,
     paddingHorizontal: 12,
+    paddingVertical: 6,
   },
 
   logoutText: {
@@ -222,7 +226,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  /* imagen a 160px */
   thumb: {
     width: "100%",
     height: 100,

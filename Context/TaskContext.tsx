@@ -1,39 +1,21 @@
 import { createContext } from "react";
 
-export type Ubicacion = {
-  lat: number;
-  lng: number;
-};
-
-export type Tarea = {
+export interface Tarea {
   id: string;
   titulo: string;
-  descripcion: string;
+  descripcion?: string;
   imagen?: string;
-  ubicacion?: Ubicacion;
-};
+  completed: boolean;
+  userEmail: string;
+  createdAt: string;
+}
 
-export type TaskContextType = {
+export interface TaskContextType {
   lista: Tarea[];
-  agregarTarea: (tarea: {
-    titulo: string;
-    descripcion: string;
-    imagen?: string;
-    ubicacion?: Ubicacion;
-  }) => void;
-
+  agregarTarea: (tarea: Omit<Tarea, "id" | "createdAt" | "userEmail">, userEmail: string) => void;
   eliminarTarea: (id: string) => void;
-
-  editarTarea: (
-    id: string,
-    cambios: {
-      titulo?: string;
-      descripcion?: string;
-      imagen?: string;
-      ubicacion?: Ubicacion;
-    }
-  ) => void;
-};
+  editarTarea: (id: string, tarea: Partial<Tarea>) => void;
+}
 
 export const TaskContext = createContext<TaskContextType>({
   lista: [],

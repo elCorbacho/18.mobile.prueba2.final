@@ -1,19 +1,21 @@
 import { ReactNode, useState } from "react";
 import uuid from "react-native-uuid";
-import { Tarea, TaskContext, Ubicacion } from "../Context/TaskContext";
+import { Tarea, TaskContext } from "../Context/TaskContext";
 
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [lista, setLista] = useState<Tarea[]>([]);
 
   const agregarTarea = (tarea: {
     titulo: string;
-    descripcion: string;
+    descripcion?: string;
     imagen?: string;
-    ubicacion?: Ubicacion;
-  }) => {
+    completed: boolean;
+  }, userEmail: string) => {
     const nueva: Tarea = {
       id: uuid.v4().toString(),
       ...tarea,
+      userEmail: userEmail,
+      createdAt: new Date().toISOString(),
     };
 
     setLista((prev) => [...prev, nueva]);
@@ -29,7 +31,6 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       titulo?: string;
       descripcion?: string;
       imagen?: string;
-      ubicacion?: Ubicacion;
     }
   ) => {
     setLista((prev) =>

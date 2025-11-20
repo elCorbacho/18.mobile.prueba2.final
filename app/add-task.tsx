@@ -20,6 +20,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import AnimatedButton from "../components/AnimatedButton";
 import Input from "../components/Input";
+import { AuthContext } from "../Context/AuthContext";
 import { TaskContext } from "../Context/TaskContext";
 import { colors } from "../theme/colors";
 
@@ -39,6 +40,7 @@ const getBackBtnStyle = (top: number): ViewStyle => ({
 export default function AddTaskScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { userEmail } = useContext(AuthContext);
   const { agregarTarea } = useContext(TaskContext);
 
   const [titulo, setTitulo] = useState("");
@@ -145,12 +147,15 @@ export default function AddTaskScreen() {
         return;
       }
 
-      agregarTarea({
-        titulo,
-        descripcion,
-        imagen: imagen ?? undefined,
-        ubicacion: ubicacion ?? undefined,
-      });
+      agregarTarea(
+        {
+          titulo: titulo,
+          descripcion: descripcion,
+          imagen: imagen || undefined,
+          completed: false,
+        },
+        userEmail!
+      );
 
       router.replace("/");
     } catch {
