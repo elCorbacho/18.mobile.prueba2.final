@@ -23,11 +23,15 @@ import { colors } from "../theme/colors";
 export default function HomeScreen() {
   const router = useRouter();
 
-  const { lista, eliminarTarea } = useContext<TaskContextType>(TaskContext);
+  const { lista, eliminarTarea, editarTarea } = useContext<TaskContextType>(TaskContext);
   const { logout, userEmail } = useContext(AuthContext);
 
   // Filtrar solo las tareas del usuario logueado
   const misTareas = lista.filter(tarea => tarea.userEmail === userEmail);
+  
+  // Separar tareas completadas y no completadas
+  const tareasNoCompletadas = misTareas.filter(tarea => !tarea.completed);
+  const tareasCompletadas = misTareas.filter(tarea => tarea.completed);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaAEliminar, setTareaAEliminar] = useState<string | null>(null);
@@ -42,6 +46,65 @@ export default function HomeScreen() {
     setModalVisible(false);
     setTareaAEliminar(null);
   };
+
+  // Cambiar estado de la tarea
+  const cambiarEstadoTarea = (id: string, currentCompleted: boolean) => {
+    editarTarea(id, { completed: !currentCompleted });
+  };
+
+  const renderTarea = ({ item, index }: { item: any; index: number }) => (
+    <Animated.View
+      entering={FadeInUp.delay(index * 50)}
+      style={styles.card}
+    >
+      <View style={styles.cardContent}>
+        <Text style={styles.itemTitulo}>{item.titulo}</Text>
+
+        {item.descripcion ? (
+          <Text style={styles.itemDescripcion}>{item.descripcion}</Text>
+        ) : null}
+
+        {/* imagen */}
+        {item.imagen && (
+          <Image
+            source={{ uri: item.imagen }}
+            style={styles.thumb}
+          />
+        )}
+
+      </View>
+
+      {/* iconos de borrar tarea y editar tarea */}
+      <View style={styles.iconRow}>
+        {/* Botón para cambiar estado */}
+        <TouchableOpacity 
+          onPress={() => cambiarEstadoTarea(item.id, item.completed)}
+          style={[styles.statusButton, item.completed ? styles.statusButtonCompleted : styles.statusButtonPending]}
+        >
+          <Ionicons 
+            name={item.completed ? "checkmark" : "close"} 
+            size={20} 
+            color="white" 
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/Edit-task",
+              params: { id: item.id },
+            })
+          }
+        >
+          <Ionicons name="create-outline" size={24} color="orange" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => confirmarEliminar(item.id)}>
+          <Ionicons name="trash" size={24} color={colors.danger} />
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,51 +134,28 @@ export default function HomeScreen() {
         <Ionicons name="add" size={32} color="white" />
       </TouchableOpacity>
 
-      {/* Lista de tareas SOLO DEL USUARIO LOGUEADO */}
+      {/* Lista de tareas con agrupadores */}
       <FlatList
-        data={misTareas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <Animated.View
-            entering={FadeInUp.delay(index * 50)}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Text style={styles.itemTitulo}>{item.titulo}</Text>
-
-              {item.descripcion ? (
-                <Text style={styles.itemDescripcion}>{item.descripcion}</Text>
-              ) : null}
-
-              {/* imagen */}
-              {item.imagen && (
-                <Image
-                  source={{ uri: item.imagen }}
-                  style={styles.thumb}
-                />
-              )}
-
-            </View>
-
-            {/* iconos de borrar tarea y editar tarea */}
-            <View style={styles.iconRow}>
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: "/Edit-task",
-                    params: { id: item.id },
-                  })
-                }
-              >
-                <Ionicons name="create-outline" size={24} color="orange" />
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => confirmarEliminar(item.id)}>
-                <Ionicons name="trash" size={24} color={colors.danger} />
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        )}
+        data={[
+          { type: "header", title: "No Completadas", count: tareasNoCompletadas.length },
+          ...tareasNoCompletadas.map(t => ({ ...t, type: "tarea" })),
+          { type: "header", title: "Completadas", count: tareasCompletadas.length },
+          ...tareasCompletadas.map(t => ({ ...t, type: "tarea" })),
+        ] as any[]}
+        keyExtractor={(item: any, index: number) => 
+          item.type === "header" ? `header-${index}` : item.id
+        }
+        renderItem={({ item, index }: { item: any; index: number }) => {
+          if (item.type === "header") {
+            return (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{item.title}</Text>
+                <Text style={styles.sectionCount}>({item.count})</Text>
+              </View>
+            );
+          }
+          return renderTarea({ item, index });
+        }}
       />
 
       {/* Modal de confirmacion */}
@@ -193,6 +233,45 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontWeight: "700",
     fontSize: 14,
+  },
+
+  sectionHeader: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    marginVertical: 10,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "white",
+  },
+
+  sectionCount: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+
+  statusButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  statusButtonPending: {
+    backgroundColor: "#FFA500",
+  },
+
+  statusButtonCompleted: {
+    backgroundColor: "#4CAF50",
   },
 
   card: {
