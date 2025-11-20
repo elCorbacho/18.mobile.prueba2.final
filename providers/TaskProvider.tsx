@@ -9,6 +9,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     titulo: string;
     descripcion?: string;
     imagen?: string;
+    ubicacion?: { lat: number; lng: number };
     completed: boolean;
   }, userEmail: string) => {
     const nueva: Tarea = {
@@ -31,6 +32,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       titulo?: string;
       descripcion?: string;
       imagen?: string;
+      ubicacion?: { lat: number; lng: number };
+      completed?: boolean;
     }
   ) => {
     setLista((prev) =>

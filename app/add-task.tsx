@@ -152,6 +152,7 @@ export default function AddTaskScreen() {
           titulo: titulo,
           descripcion: descripcion,
           imagen: imagen || undefined,
+          ubicacion: ubicacion || undefined,
           completed: false,
         },
         userEmail!
