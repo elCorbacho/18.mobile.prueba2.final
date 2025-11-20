@@ -24,7 +24,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const { lista, eliminarTarea } = useContext<TaskContextType>(TaskContext);
-  const { logout } = useContext(AuthContext);
+  const { logout, userEmail } = useContext(AuthContext);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaAEliminar, setTareaAEliminar] = useState<string | null>(null);
@@ -45,10 +45,15 @@ export default function HomeScreen() {
       {/* Titulo */}
       <Text style={styles.titulo}>Mis Tareas</Text>
 
-      {/* Boton cerrar sesion */}
-      <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
-        <Text style={styles.logoutText}>Cerrar sesion</Text>
-      </TouchableOpacity>
+      {/* Email y boton cerrar sesion en la misma fila */}
+      <View style={styles.headerRow}>
+        <View style={styles.emailContainer}>
+          <Text style={styles.emailText}>{userEmail}</Text>
+        </View>
+        <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
+          <Text style={styles.logoutText}>Cerrar sesion</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Boton flotante de agregar tarea */}
       <TouchableOpacity
@@ -155,15 +160,35 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
 
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  emailContainer: {
+    backgroundColor: colors.card,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+
+  emailText: {
+    fontSize: 12,
+    color: "#666",
+    fontWeight: "500",
+  },
+
   logoutBtn: {
-    alignSelf: "flex-end",
-    marginBottom: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
 
   logoutText: {
     color: colors.danger,
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
   },
 
   card: {
