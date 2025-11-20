@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
-  FlatList,
-  Image,
-  Modal,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    Image,
+    Modal,
+    Platform,
+    Pressable,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import Animated, { FadeInUp } from "react-native-reanimated";
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   botonAdd: {
     position: "absolute",
     right: 20,
-    bottom: 20,
+    bottom: Platform.OS === "android" ? 80 : 20,
     backgroundColor: colors.primary,
     width: 60,
     height: 60,

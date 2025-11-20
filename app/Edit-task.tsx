@@ -1,13 +1,13 @@
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -88,7 +88,8 @@ export default function EditTaskScreen() {
       if (!ok) return;
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
+        mediaTypes: "images",
+        allowsEditing: Platform.OS === "ios",
         quality: 0.8,
       });
 
@@ -104,7 +105,8 @@ export default function EditTaskScreen() {
       if (!ok) return;
 
       const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
+        mediaTypes: "images",
+        allowsEditing: Platform.OS === "ios",
         quality: 0.8,
       });
 
