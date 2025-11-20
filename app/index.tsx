@@ -1,24 +1,21 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
     FlatList,
-    Image,
-    Modal,
     Platform,
-    Pressable,
     SafeAreaView,
     StyleSheet,
-    Text,
     TouchableOpacity,
-    View,
 } from "react-native";
 
-import Animated, { FadeInUp } from "react-native-reanimated";
-
+import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../Context/AuthContext";
 import { TaskContext, TaskContextType } from "../Context/TaskContext";
 import { colors } from "../theme/colors";
+import { Header } from "../components/Header";
+import { SectionHeader } from "../components/SectionHeader";
+import { TaskCard } from "../components/TaskCard";
+import { DeleteModal } from "../components/DeleteModal";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -52,77 +49,12 @@ export default function HomeScreen() {
     editarTarea(id, { completed: !currentCompleted });
   };
 
-  const renderTarea = ({ item, index }: { item: any; index: number }) => (
-    <Animated.View
-      entering={FadeInUp.delay(index * 50)}
-      style={styles.card}
-    >
-      <View style={styles.cardContent}>
-        <Text style={styles.itemTitulo}>{item.titulo}</Text>
-
-        {item.descripcion ? (
-          <Text style={styles.itemDescripcion}>{item.descripcion}</Text>
-        ) : null}
-
-        {/* imagen */}
-        {item.imagen && (
-          <Image
-            source={{ uri: item.imagen }}
-            style={styles.thumb}
-          />
-        )}
-
-      </View>
-
-      {/* iconos de borrar tarea y editar tarea */}
-      <View style={styles.iconRow}>
-        {/* Botón para cambiar estado */}
-        <TouchableOpacity 
-          onPress={() => cambiarEstadoTarea(item.id, item.completed)}
-          style={[styles.statusButton, item.completed ? styles.statusButtonCompleted : styles.statusButtonPending]}
-        >
-          <Ionicons 
-            name={item.completed ? "checkmark" : "close"} 
-            size={20} 
-            color="white" 
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/Edit-task",
-              params: { id: item.id },
-            })
-          }
-        >
-          <Ionicons name="create-outline" size={24} color="orange" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => confirmarEliminar(item.id)}>
-          <Ionicons name="trash" size={24} color={colors.danger} />
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Titulo */}
-      <Text style={styles.titulo}>Mis Tareas</Text>
+      {/* Header con email y logout */}
+      <Header userEmail={userEmail || ""} onLogout={logout} />
 
-      {/* Email y Cerrar sesion en la misma fila */}
-      <View style={styles.headerRow}>
-        <View style={styles.emailContainer}>
-          <Text style={styles.emailText}>{userEmail}</Text>
-        </View>
-
-        <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
-          <Text style={styles.logoutText}>Cerrar sesion</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Boton flotante de agregar tarea */}
+      {/* Botón flotante de agregar tarea */}
       <TouchableOpacity
         style={styles.botonAdd}
         onPress={() =>
@@ -148,174 +80,43 @@ export default function HomeScreen() {
         renderItem={({ item, index }: { item: any; index: number }) => {
           if (item.type === "header") {
             return (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>{item.title}</Text>
-                <Text style={styles.sectionCount}>({item.count})</Text>
-              </View>
+              <SectionHeader title={item.title} count={item.count} />
             );
           }
-          return renderTarea({ item, index });
+          return (
+            <TaskCard
+              item={item}
+              index={index}
+              onChangeStatus={() => cambiarEstadoTarea(item.id, item.completed)}
+              onDelete={() => confirmarEliminar(item.id)}
+              onEdit={() =>
+                router.push({
+                  pathname: "/Edit-task",
+                  params: { id: item.id },
+                })
+              }
+            />
+          );
         }}
       />
 
-      {/* Modal de confirmacion */}
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.modalFondo}>
-          <View style={styles.modalBox}>
-            <Ionicons name="warning-outline" size={40} color={colors.danger} />
-
-            <Text style={styles.modalTitulo}>¿Eliminar tarea?</Text>
-            <Text style={styles.modalTexto}>Esta acción no se puede deshacer.</Text>
-
-            <View style={styles.modalBotones}>
-              <Pressable
-                onPress={() => setModalVisible(false)}
-                style={styles.botonCancelar}
-              >
-                <Text style={styles.cancelarText}>Cancelar</Text>
-              </Pressable>
-
-              <Pressable onPress={borrar} style={styles.botonEliminar}>
-                <Text style={styles.eliminarText}>Eliminar</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Modal de confirmación */}
+      <DeleteModal
+        visible={modalVisible}
+        onConfirm={borrar}
+        onCancel={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
 
 /* estilos */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "ios" ? 60 : 20,
     backgroundColor: colors.background,
-  },
-
-  titulo: {
-    fontSize: 32,
-    fontWeight: "800",
-    textAlign: "center",
-    marginBottom: 10,
-    color: colors.text,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-
-  emailContainer: {
-    backgroundColor: colors.card,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-
-  emailText: {
-    fontSize: 12,
-    color: "#666",
-    fontWeight: "500",
-  },
-
-  logoutBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-
-  logoutText: {
-    color: colors.danger,
-    fontWeight: "700",
-    fontSize: 14,
-  },
-
-  sectionHeader: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    marginVertical: 10,
-    borderRadius: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "white",
-  },
-
-  sectionCount: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "white",
-  },
-
-  statusButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  statusButtonPending: {
-    backgroundColor: "#FFA500",
-  },
-
-  statusButtonCompleted: {
-    backgroundColor: "#4CAF50",
-  },
-
-  card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: colors.card,
-    padding: 18,
-    borderRadius: 14,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-
-  cardContent: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  itemTitulo: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
-
-  itemDescripcion: {
-    fontSize: 15,
-    color: "#444",
-    marginBottom: 10,
-  },
-
-  thumb: {
-    width: "100%",
-    height: 100,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-
-  iconRow: {
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    gap: 10,
   },
 
   botonAdd: {
@@ -330,67 +131,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
     zIndex: 999,
-  },
-
-  modalFondo: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-
-  modalBox: {
-    width: 300,
-    backgroundColor: "white",
-    padding: 25,
-    borderRadius: 15,
-    alignItems: "center",
-  },
-
-  modalTitulo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: colors.text,
-    marginVertical: 10,
-  },
-
-  modalTexto: {
-    textAlign: "center",
-    color: "#666",
-    marginBottom: 20,
-    fontSize: 16,
-  },
-
-  modalBotones: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-
-  botonCancelar: {
-    flex: 1,
-    padding: 12,
-    alignItems: "center",
-  },
-
-  botonEliminar: {
-    flex: 1,
-    padding: 12,
-    alignItems: "center",
-    backgroundColor: colors.danger,
-    borderRadius: 10,
-  },
-
-  cancelarText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
-  eliminarText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "700",
   },
 });
