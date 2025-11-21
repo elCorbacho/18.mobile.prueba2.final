@@ -13,7 +13,7 @@ import { AuthContext } from "../Context/AuthContext";
 import { TaskContext, TaskContextType } from "../Context/TaskContext";
 import { colors } from "../theme/colors";
 import { Header } from "../components/Header";
-import { SectionHeader } from "../components/SectionHeader";
+import { CollapsibleSection } from "../components/CollapsibleSection";
 import { TaskCard } from "../components/TaskCard";
 import { DeleteModal } from "../components/DeleteModal";
 
@@ -32,6 +32,8 @@ export default function HomeScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaAEliminar, setTareaAEliminar] = useState<string | null>(null);
+  const [expandedNoCompletadas, setExpandedNoCompletadas] = useState(true);
+  const [expandedCompletadas, setExpandedCompletadas] = useState(true);
 
   const confirmarEliminar = (id: string) => {
     setTareaAEliminar(id);
@@ -66,38 +68,53 @@ export default function HomeScreen() {
         <Ionicons name="add" size={32} color="white" />
       </TouchableOpacity>
 
-      {/* Lista de tareas con agrupadores */}
+      {/* Secciones colapsables de tareas */}
       <FlatList
         data={[
-          { type: "header", title: "No Completadas", count: tareasNoCompletadas.length },
-          ...tareasNoCompletadas.map(t => ({ ...t, type: "tarea" })),
-          { type: "header", title: "Completadas", count: tareasCompletadas.length },
-          ...tareasCompletadas.map(t => ({ ...t, type: "tarea" })),
+          {
+            type: "section",
+            id: "no-completadas",
+            title: "No Completadas",
+            count: tareasNoCompletadas.length,
+            expanded: expandedNoCompletadas,
+            setExpanded: setExpandedNoCompletadas,
+            tareas: tareasNoCompletadas,
+          },
+          {
+            type: "section",
+            id: "completadas",
+            title: "Completadas",
+            count: tareasCompletadas.length,
+            expanded: expandedCompletadas,
+            setExpanded: setExpandedCompletadas,
+            tareas: tareasCompletadas,
+          },
         ] as any[]}
-        keyExtractor={(item: any, index: number) => 
-          item.type === "header" ? `header-${index}` : item.id
-        }
-        renderItem={({ item, index }: { item: any; index: number }) => {
-          if (item.type === "header") {
-            return (
-              <SectionHeader title={item.title} count={item.count} />
-            );
-          }
-          return (
-            <TaskCard
-              item={item}
-              index={index}
-              onChangeStatus={() => cambiarEstadoTarea(item.id, item.completed)}
-              onDelete={() => confirmarEliminar(item.id)}
-              onEdit={() =>
-                router.push({
-                  pathname: "/Edit-task",
-                  params: { id: item.id },
-                })
-              }
-            />
-          );
-        }}
+        keyExtractor={(item: any) => item.id}
+        renderItem={({ item }: { item: any }) => (
+          <CollapsibleSection
+            title={item.title}
+            count={item.count}
+            isExpanded={item.expanded}
+            onToggle={() => item.setExpanded(!item.expanded)}
+          >
+            {item.tareas.map((tarea: any, index: number) => (
+              <TaskCard
+                key={tarea.id}
+                item={tarea}
+                index={index}
+                onChangeStatus={() => cambiarEstadoTarea(tarea.id, tarea.completed)}
+                onDelete={() => confirmarEliminar(tarea.id)}
+                onEdit={() =>
+                  router.push({
+                    pathname: "/Edit-task",
+                    params: { id: tarea.id },
+                  })
+                }
+              />
+            ))}
+          </CollapsibleSection>
+        )}
       />
 
       {/* Modal de confirmación */}

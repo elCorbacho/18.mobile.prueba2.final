@@ -152,6 +152,7 @@ export default function AddTaskScreen() {
           titulo: titulo,
           descripcion: descripcion,
           imagen: imagen || undefined,
+          ubicacion: ubicacion || undefined,
           completed: false,
         },
         userEmail!
@@ -195,13 +196,15 @@ export default function AddTaskScreen() {
             <AnimatedButton
               label="Elegir de la galería"
               onPress={elegirImagen}
-              color="#6C5CE7"
+              color="#8f82eeff"
+              icon="images-outline"
             />
 
             <AnimatedButton
               label="Tomar foto"
               onPress={tomarFoto}
-              color="#E67E22"
+              color="#eeb17bff"
+              icon="camera-outline"
             />
 
             {imagen && (
@@ -211,7 +214,8 @@ export default function AddTaskScreen() {
             <AnimatedButton
               label="Obtener ubicación"
               onPress={obtenerUbicacion}
-              color="#0984E3"
+              color="#268fdfff"
+              icon="location-outline"
             />
 
             {ubicacion && (
@@ -239,7 +243,8 @@ export default function AddTaskScreen() {
             <AnimatedButton
               label="Guardar tarea"
               onPress={guardar}
-              color="#27AE60"
+              color="#3aac69ff"
+              icon="checkmark-done-outline"
             />
           </View>
         </ScrollView>

@@ -1,27 +1,29 @@
-# TodoList App
+# 📝 TodoList App
 
 Aplicación móvil de gestión de tareas desarrollada con React Native y Expo.
 
-## Características
+## ✨ Características
 
 - ✅ Autenticación por correo electrónico
 - ✅ Creación, edición y eliminación de tareas
 - ✅ Clasificación de tareas (Completadas / No Completadas)
 - ✅ Filtrado de tareas por usuario
 - ✅ Interfaz limpia y responsiva
+- 📍 Localización con mapa integrado
+- 📸 Captura de imágenes desde cámara o galería
 
-## Requisitos
+## 📋 Requisitos
 
 - Node.js 16+
 - npm o yarn
 
-## Instalación
+## 🚀 Instalación
 
 ```bash
 npm install
 ```
 
-## Ejecución
+## ▶️ Ejecución
 
 ```bash
 npx expo start
@@ -29,27 +31,30 @@ npx expo start
 
 Escanea el código QR con Expo Go o ejecuta en emulador.
 
-## Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
 ```
 eva_2_todolist/
-├── app/                    # Pantallas principales
-├── components/             # Componentes reutilizables
-├── Context/                # Context API para estado global
-├── providers/              # Proveedores de contexto
-├── theme/                  # Estilos y colores
-└── constants/              # Configuraciones
+├── app/                    # 📱 Pantallas principales
+├── components/             # 🧩 Componentes reutilizables
+├── Context/                # 🔄 Context API para estado global
+├── providers/              # 📦 Proveedores de contexto
+├── theme/                  # 🎨 Estilos y colores
+└── constants/              # ⚙️ Configuraciones
 ```
 
-## Tecnologías
+## 🛠️ Tecnologías
 
-- React Native + Expo
-- TypeScript
-- Context API
-- react-native-safe-area-context
-- Ionicons
+- ⚛️ React Native + Expo
+- 📘 TypeScript
+- 🔄 Context API
+- 🔐 react-native-safe-area-context
+- 🎯 Ionicons
+- 🗺️ react-native-maps
+- 📷 expo-image-picker
+- 📍 expo-location
 
-## Licencia
+## 📄 Licencia
 
 MIT
 

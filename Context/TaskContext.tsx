@@ -5,6 +5,7 @@ export interface Tarea {
   titulo: string;
   descripcion?: string;
   imagen?: string;
+  ubicacion?: { lat: number; lng: number };
   completed: boolean;
   userEmail: string;
   createdAt: string;
